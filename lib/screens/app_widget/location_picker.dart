@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:week_3_blabla_project/dummy_data/dummy_data.dart';
 import 'package:week_3_blabla_project/theme/theme.dart';
+import 'package:week_3_blabla_project/utils/animations_util.dart';
 import '../../../model/ride/locations.dart';
 
 class LocationPicker extends StatefulWidget {
@@ -20,82 +21,41 @@ class LocationPicker extends StatefulWidget {
 }
 
 class _LocationPickerState extends State<LocationPicker> {
-  late Location? selectedLocation;
-  List<Location> filteredLocations = [];
+  Location? selectedLocation;
   final TextEditingController _searchController = TextEditingController();
+  List<Location> _filteredLocations = [];
 
   @override
   void initState() {
     super.initState();
     selectedLocation = widget.initialLocation;
-    filteredLocations = fakeLocations; 
+    _filteredLocations = fakeLocations;
+  }
+
+  @override
+  void didUpdateWidget(covariant LocationPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialLocation != oldWidget.initialLocation) {
+      setState(() {
+        selectedLocation = widget.initialLocation;
+      });
+    }
   }
 
   void _showLocationDialog() async {
-    final Location? result = await showDialog<Location>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            "Select ${widget.label} Location",
-            style: BlaTextStyles.heading.copyWith(color: BlaColors.neutralDark),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: "Search for a location...",
-                  prefixIcon: Icon(Icons.search, color: BlaColors.neutralLight),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(BlaSpacings.radius),
-                  ),
-                ),
-                onChanged: (query) {
-                  if (query.length >= 3) {
-                    setState(() {
-                      filteredLocations = fakeLocations
-                          .where((location) => location.name
-                              .toLowerCase()
-                              .contains(query.toLowerCase()))
-                          .toList();
-                    });
-                  } else {
-                    setState(() {
-                      filteredLocations =
-                          fakeLocations; 
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: BlaSpacings.s),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: filteredLocations.map((location) {
-                      return ListTile(
-                        title: Text(
-                          location.name,
-                          style: BlaTextStyles.body
-                              .copyWith(color: BlaColors.neutralDark),
-                        ),
-                        subtitle: Text(
-                          location.country.name,
-                          style: BlaTextStyles.label
-                              .copyWith(color: BlaColors.neutralLight),
-                        ),
-                        onTap: () => Navigator.pop(context, location),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    _searchController.clear();
+    _filteredLocations = fakeLocations;
+
+    final Location? result = await Navigator.push(
+      context,
+      AnimationUtils.createBottomToTopRoute(
+        LocationSelectionScreen(
+          initialSelection: selectedLocation,
+          onLocationSelected: (location) {
+            Navigator.pop(context, location);
+          },
+        ),
+      ),
     );
 
     if (result != null) {
@@ -104,32 +64,99 @@ class _LocationPickerState extends State<LocationPicker> {
       });
       widget.onLocationSelected(result);
     }
-    _searchController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: _showLocationDialog,
-      child: Container(
-        padding: const EdgeInsets.all(BlaSpacings.s),
-        decoration: BoxDecoration(
-          border: Border.all(color: BlaColors.greyLight),
-          borderRadius: BorderRadius.circular(BlaSpacings.radius),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              selectedLocation?.name ?? "Select ${widget.label} Location",
-              style: BlaTextStyles.body.copyWith(color: BlaColors.neutralDark),
-            ),
-            Icon(
-              Icons.location_on,
-              color: BlaColors.primary,
+            Icon(Icons.location_on, color: BlaColors.primary, size: 24),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                selectedLocation?.name ?? 'Select ${widget.label} Location',
+                style: BlaTextStyles.body.copyWith(
+                  color: selectedLocation != null
+                      ? BlaColors.textNormal
+                      : BlaColors.textLight,
+                ),
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class LocationSelectionScreen extends StatefulWidget {
+  final Location? initialSelection;
+  final void Function(Location) onLocationSelected;
+
+  const LocationSelectionScreen({
+    super.key,
+    this.initialSelection,
+    required this.onLocationSelected,
+  });
+
+  @override
+  State<LocationSelectionScreen> createState() =>
+      _LocationSelectionScreenState();
+}
+
+class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Location> _filteredLocations = fakeLocations;
+
+  void _filterLocations(String query) {
+    setState(() {
+      _filteredLocations = query.isNotEmpty
+          ? fakeLocations
+              .where(
+                  (loc) => loc.name.toLowerCase().contains(query.toLowerCase()))
+              .toList()
+          : fakeLocations;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: BlaColors.white,
+      appBar: AppBar(
+        backgroundColor: BlaColors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: BlaColors.textNormal),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: TextField(
+          controller: _searchController,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: "Search location",
+            border: InputBorder.none,
+          ),
+          onChanged: _filterLocations,
+        ),
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: _filteredLocations.length,
+        separatorBuilder: (_, __) => Divider(color: BlaColors.greyLight),
+        itemBuilder: (context, index) {
+          final location = _filteredLocations[index];
+          return ListTile(
+            title: Text(location.name, style: BlaTextStyles.body),
+            subtitle: Text(location.country.name, style: BlaTextStyles.label),
+            trailing: Icon(Icons.arrow_forward_ios,
+                color: BlaColors.iconLight, size: 16),
+            onTap: () => widget.onLocationSelected(location),
+          );
+        },
       ),
     );
   }

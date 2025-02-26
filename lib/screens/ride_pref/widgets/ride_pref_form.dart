@@ -5,7 +5,8 @@ import 'package:week_3_blabla_project/screens/app_widget/blabla_button.dart';
 import 'package:week_3_blabla_project/screens/app_widget/location_picker.dart';
 import 'package:week_3_blabla_project/screens/app_widget/date_picker.dart';
 import 'package:week_3_blabla_project/screens/app_widget/seat_number_spinner.dart';
-import 'package:week_3_blabla_project/utils/animations_util.dart'; // Import AnimationUtils
+import 'package:week_3_blabla_project/theme/theme.dart';
+import 'package:week_3_blabla_project/utils/animations_util.dart';
 
 class RidePrefForm extends StatefulWidget {
   final RidePref? initRidePref;
@@ -18,8 +19,8 @@ class RidePrefForm extends StatefulWidget {
 
 class _RidePrefFormState extends State<RidePrefForm> {
   Location? departure;
-  late DateTime departureDate;
   Location? arrival;
+  late DateTime departureDate;
   late int requestedSeats;
 
   @override
@@ -76,93 +77,91 @@ class _RidePrefFormState extends State<RidePrefForm> {
     }
   }
 
-  // Helper method to open LocationPicker with bottom-to-top transition
-  void _openLocationPicker(String label, Function(Location) onLocationSelected,
-      Location? initialLocation) {
-    Navigator.of(context).push(
-      AnimationUtils.createBottomToTopRoute(
-        LocationPicker(
-          label: label,
-          initialLocation: initialLocation,
-          onLocationSelected: onLocationSelected,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Departure Location Picker
-        InkWell(
-          onTap: () => _openLocationPicker(
-            "Departure",
-            _updateDeparture,
-            departure,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  departure?.name ?? "Select Departure Location",
-                  style: TextStyle(fontSize: 16),
+        Container(
+          padding: const EdgeInsets.all(BlaSpacings.m),
+          margin: const EdgeInsets.symmetric(horizontal: BlaSpacings.m),
+          child: Column(
+            children: [
+              // Departure Location Picker with Swap Button
+              Stack(
+                children: [
+                  LocationPicker(
+                    label: "Departure",
+                    initialLocation: departure,
+                    onLocationSelected: _updateDeparture,
+                  ),
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: IconButton(
+                      icon: Icon(Icons.swap_vert, color: BlaColors.primary),
+                      onPressed: _switchLocations,
+                    ),
+                  ),
+                ],
+              ),
+
+              Divider(color: BlaColors.greyLight, thickness: 1),
+
+              // Arrival Location Picker
+              LocationPicker(
+                label: "Arrival",
+                initialLocation: arrival,
+                onLocationSelected: _updateArrival,
+              ),
+
+              Divider(color: BlaColors.greyLight, thickness: 1),
+
+              // Date Picker
+              ListTile(
+                leading:
+                    Icon(Icons.calendar_today, color: BlaColors.iconNormal),
+                title: Text(
+                  "Today",
+                  style:
+                      BlaTextStyles.body.copyWith(color: BlaColors.textNormal),
                 ),
-                Icon(Icons.location_on, color: Colors.blue),
-              ],
-            ),
-          ),
-        ),
-        IconButton(
-          icon: Icon(Icons.swap_vert),
-          onPressed: _switchLocations,
-        ),
-        // Arrival Location Picker
-        InkWell(
-          onTap: () => _openLocationPicker(
-            "Arrival",
-            _updateArrival,
-            arrival,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  arrival?.name ?? "Select Arrival Location",
-                  style: TextStyle(fontSize: 16),
+                onTap: () {
+                  // TODO: Implement date picker functionality
+                },
+              ),
+
+              Divider(color: BlaColors.greyLight, thickness: 1),
+
+              // Seat Picker
+              ListTile(
+                leading: Icon(Icons.person, color: BlaColors.iconNormal),
+                title: Text(
+                  requestedSeats.toString(),
+                  style:
+                      BlaTextStyles.body.copyWith(color: BlaColors.textNormal),
                 ),
-                Icon(Icons.location_on, color: Colors.blue),
-              ],
-            ),
+                onTap: () {
+                  // TODO: Implement seat number picker functionality
+                },
+              ),
+            ],
           ),
         ),
-        DatePicker(
-          initialDate: departureDate,
-          onDateSelected: _updateDepartureDate,
-        ),
-        SeatNumberSpinner(
-          initialValue: requestedSeats,
-          onChanged: _updateSeats,
-        ),
-        BlaButton(
-          text: "Search",
-          onPressed: _onSearchPressed,
-          isPrimary: true,
-          icon: Icons.search,
+
+        const SizedBox(height: 20),
+
+        // Search Button
+        SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: BlaSpacings.m),
+            child: BlaButton(
+              text: "Search",
+              onPressed: _onSearchPressed,
+              isPrimary: true,
+              icon: Icons.search,
+            ),
+          ),
         ),
       ],
     );
