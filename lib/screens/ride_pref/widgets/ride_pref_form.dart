@@ -5,6 +5,7 @@ import 'package:week_3_blabla_project/screens/app_widget/blabla_button.dart';
 import 'package:week_3_blabla_project/screens/app_widget/location_picker.dart';
 import 'package:week_3_blabla_project/screens/app_widget/date_picker.dart';
 import 'package:week_3_blabla_project/screens/app_widget/seat_number_spinner.dart';
+import 'package:week_3_blabla_project/utils/animations_util.dart'; // Import AnimationUtils
 
 class RidePrefForm extends StatefulWidget {
   final RidePref? initRidePref;
@@ -75,25 +76,79 @@ class _RidePrefFormState extends State<RidePrefForm> {
     }
   }
 
+  // Helper method to open LocationPicker with bottom-to-top transition
+  void _openLocationPicker(String label, Function(Location) onLocationSelected,
+      Location? initialLocation) {
+    Navigator.of(context).push(
+      AnimationUtils.createBottomToTopRoute(
+        LocationPicker(
+          label: label,
+          initialLocation: initialLocation,
+          onLocationSelected: onLocationSelected,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        LocationPicker(
-          label: "Departure",
-          initialLocation: departure,
-          onLocationSelected: _updateDeparture,
+        // Departure Location Picker
+        InkWell(
+          onTap: () => _openLocationPicker(
+            "Departure",
+            _updateDeparture,
+            departure,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  departure?.name ?? "Select Departure Location",
+                  style: TextStyle(fontSize: 16),
+                ),
+                Icon(Icons.location_on, color: Colors.blue),
+              ],
+            ),
+          ),
         ),
         IconButton(
           icon: Icon(Icons.swap_vert),
           onPressed: _switchLocations,
         ),
-        LocationPicker(
-          label: "Arrival",
-          initialLocation: arrival,
-          onLocationSelected: _updateArrival,
+        // Arrival Location Picker
+        InkWell(
+          onTap: () => _openLocationPicker(
+            "Arrival",
+            _updateArrival,
+            arrival,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  arrival?.name ?? "Select Arrival Location",
+                  style: TextStyle(fontSize: 16),
+                ),
+                Icon(Icons.location_on, color: Colors.blue),
+              ],
+            ),
+          ),
         ),
         DatePicker(
           initialDate: departureDate,
