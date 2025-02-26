@@ -1,4 +1,3 @@
-
 import 'package:intl/intl.dart';
 
 ////
@@ -22,6 +21,14 @@ class DateTimeUtils {
   }
 
   static String formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime); // Example: 14:30 (24-hour format)
+    return DateFormat('HH:mm')
+        .format(dateTime); // Example: 14:30 (24-hour format)
+  }
+
+  static String calculateDuration(DateTime start, DateTime end) {
+    final duration = end.difference(start);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    return "${hours}h${minutes.toString().padLeft(2, '0')}";
   }
 }

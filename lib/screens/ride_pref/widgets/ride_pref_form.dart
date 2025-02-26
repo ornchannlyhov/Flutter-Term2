@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:week_3_blabla_project/dummy_data/dummy_data.dart';
+import 'package:week_3_blabla_project/screens/ride/ride_screen.dart';
 import '../../../model/ride/locations.dart';
 import '../../../model/ride_pref/ride_pref.dart';
 import 'package:week_3_blabla_project/screens/app_widget/blabla_button.dart';
@@ -73,7 +75,15 @@ class _RidePrefFormState extends State<RidePrefForm> {
         requestedSeats: requestedSeats,
       );
 
-      Navigator.pop(context, ridePref);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RidesScreen(
+            ridePref: ridePref,
+            rides: fakeRides,
+          ),
+        ),
+      );
     }
   }
 
