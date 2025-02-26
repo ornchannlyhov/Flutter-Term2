@@ -17,11 +17,11 @@ class AnimationUtils {
       Widget screen, Offset begin, Offset end) {
     return PageRouteBuilder<T>(
       transitionDuration:
-          const Duration(milliseconds: transitionSpeed), // Animation speed
+          const Duration(milliseconds: transitionSpeed), 
       pageBuilder: (context, animation, secondaryAnimation) => screen,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var tween = Tween(begin: begin, end: end)
-            .chain(CurveTween(curve: Curves.easeInOut)); // Smooth animation
+            .chain(CurveTween(curve: Curves.easeInOut)); 
 
         return SlideTransition(
           position: animation.drive(tween),

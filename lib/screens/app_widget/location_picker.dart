@@ -23,6 +23,7 @@ class LocationPicker extends StatefulWidget {
 class _LocationPickerState extends State<LocationPicker> {
   Location? selectedLocation;
   final TextEditingController _searchController = TextEditingController();
+  // ignore: unused_field
   List<Location> _filteredLocations = [];
 
   @override

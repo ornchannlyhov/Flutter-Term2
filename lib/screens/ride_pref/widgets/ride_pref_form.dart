@@ -8,7 +8,6 @@ import 'package:week_3_blabla_project/screens/app_widget/location_picker.dart';
 import 'package:week_3_blabla_project/screens/app_widget/date_picker.dart';
 import 'package:week_3_blabla_project/screens/app_widget/seat_number_spinner.dart';
 import 'package:week_3_blabla_project/theme/theme.dart';
-import 'package:week_3_blabla_project/utils/animations_util.dart';
 
 class RidePrefForm extends StatefulWidget {
   final RidePref? initRidePref;
@@ -114,51 +113,28 @@ class _RidePrefFormState extends State<RidePrefForm> {
                   ),
                 ],
               ),
-
               Divider(color: BlaColors.greyLight, thickness: 1),
-
               // Arrival Location Picker
               LocationPicker(
                 label: "Arrival",
                 initialLocation: arrival,
                 onLocationSelected: _updateArrival,
               ),
-
               Divider(color: BlaColors.greyLight, thickness: 1),
-
               // Date Picker
-              ListTile(
-                leading:
-                    Icon(Icons.calendar_today, color: BlaColors.iconNormal),
-                title: Text(
-                  "Today",
-                  style:
-                      BlaTextStyles.body.copyWith(color: BlaColors.textNormal),
-                ),
-                onTap: () {
-                  // TODO: Implement date picker functionality
-                },
+              DatePicker(
+                initialDate: departureDate,
+                onDateSelected: _updateDepartureDate,
               ),
-
               Divider(color: BlaColors.greyLight, thickness: 1),
-
               // Seat Picker
-              ListTile(
-                leading: Icon(Icons.person, color: BlaColors.iconNormal),
-                title: Text(
-                  requestedSeats.toString(),
-                  style:
-                      BlaTextStyles.body.copyWith(color: BlaColors.textNormal),
-                ),
-                onTap: () {
-                  // TODO: Implement seat number picker functionality
-                },
+              SeatNumberSpinner(
+                initialValue: requestedSeats,
+                onChanged: _updateSeats,
               ),
             ],
           ),
         ),
-
-        const SizedBox(height: 20),
 
         // Search Button
         SizedBox(
