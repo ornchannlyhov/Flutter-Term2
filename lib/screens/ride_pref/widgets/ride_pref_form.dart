@@ -66,7 +66,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
     });
   }
 
-  void _onSearchPressed() {
+  void _onSearchPressed() async {
     if (departure != null && arrival != null) {
       RidePref ridePref = RidePref(
         departure: departure!,
@@ -74,27 +74,31 @@ class _RidePrefFormState extends State<RidePrefForm> {
         departureDate: departureDate,
         requestedSeats: requestedSeats,
       );
-        // Filter rides based on RidePref using RidesService.getRidesFor
-    List<Ride> filteredRides = RidesService.getRidesFor(ridePref).where((ride) {
-      bool sameDay = ride.departureDate.year == ridePref.departureDate.year &&
-          ride.departureDate.month == ridePref.departureDate.month &&
-          ride.departureDate.day == ridePref.departureDate.day;
 
-      return ride.availableSeats >= ridePref.requestedSeats && sameDay;
-    }).toList();
+      RidesFilter ridesFilter =
+          RidesFilter(petAccepted: true); 
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => RidesScreen(
-            ridePref: ridePref,
-            rides: filteredRides,
+      try {
+        List<Ride> filteredRides =
+            await RidesService.instance.getRides(ridePref, ridesFilter);
+
+        if (!mounted) return; 
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RidesScreen(
+              ridePref: ridePref,
+              rides: filteredRides,
+            ),
           ),
-        ),
-      );
+        );
+      } catch (e) {
+        print(
+            "Error fetching rides: $e"); 
+      }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Column(

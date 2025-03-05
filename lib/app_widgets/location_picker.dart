@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:week_3_blabla_project/repositories/mocklocations_repository.dart';
+import 'package:week_3_blabla_project/repositories/locations/mocklocations_repository.dart';
 import 'package:week_3_blabla_project/service/locations_service.dart';
 import 'package:week_3_blabla_project/theme/theme.dart';
 import 'package:week_3_blabla_project/utils/animations_util.dart';

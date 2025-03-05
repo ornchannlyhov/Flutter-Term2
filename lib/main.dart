@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:week_3_blabla_project/repositories/rides/rides_repository.dart';
+import 'package:week_3_blabla_project/service/rides_service.dart';
 import 'screens/ride_pref/ride_pref_screen.dart';
 import 'theme/theme.dart';
 
 void main() {
+  RidesService.initialize(RidesRepositoryImpl());
   runApp(const MyApp());
 }
 

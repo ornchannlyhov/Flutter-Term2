@@ -1,5 +1,5 @@
 import 'package:week_3_blabla_project/model/ride/locations.dart';
-import 'package:week_3_blabla_project/repositories/locations_repostory.dart';
+import 'package:week_3_blabla_project/repositories/locations/locations_repository.dart';
 
 class MockLocationsRepository implements LocationsRepository {
   @override
