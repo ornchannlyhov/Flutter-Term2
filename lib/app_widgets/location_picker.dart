@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:week_3_blabla_project/dummy_data/dummy_data.dart';
+import 'package:week_3_blabla_project/repositories/mocklocations_repository.dart';
+import 'package:week_3_blabla_project/service/locations_service.dart';
 import 'package:week_3_blabla_project/theme/theme.dart';
 import 'package:week_3_blabla_project/utils/animations_util.dart';
 import '../../model/ride/locations.dart';
@@ -26,11 +27,22 @@ class _LocationPickerState extends State<LocationPicker> {
   // ignore: unused_field
   List<Location> _filteredLocations = [];
 
+  // Initialize LocationService and LocationsRepository
+  final LocationsService _locationService = LocationsService(MockLocationsRepository());
+
+
   @override
   void initState() {
     super.initState();
     selectedLocation = widget.initialLocation;
-    _filteredLocations = fakeLocations;
+    _loadLocations();
+  }
+
+  Future<void> _loadLocations() async {
+    List<Location> locations = await _locationService.getLocations();
+    setState(() {
+      _filteredLocations = locations;
+    });
   }
 
   @override
@@ -45,12 +57,13 @@ class _LocationPickerState extends State<LocationPicker> {
 
   void _showLocationDialog() async {
     _searchController.clear();
-    _filteredLocations = fakeLocations;
+    // No longer use fakeLocations, the LocationSelectionScreen will get locations from repository
 
     final Location? result = await Navigator.push(
       context,
       AnimationUtils.createBottomToTopRoute(
         LocationSelectionScreen(
+          locationService: _locationService, // Pass the service instance
           initialSelection: selectedLocation,
           onLocationSelected: (location) {
             Navigator.pop(context, location);
@@ -97,11 +110,13 @@ class _LocationPickerState extends State<LocationPicker> {
 class LocationSelectionScreen extends StatefulWidget {
   final Location? initialSelection;
   final void Function(Location) onLocationSelected;
+  final LocationsService locationService;
 
   const LocationSelectionScreen({
     super.key,
     this.initialSelection,
     required this.onLocationSelected,
+    required this.locationService,
   });
 
   @override
@@ -111,16 +126,31 @@ class LocationSelectionScreen extends StatefulWidget {
 
 class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Location> _filteredLocations = fakeLocations;
+  List<Location> _filteredLocations = [];
 
-  void _filterLocations(String query) {
+  @override
+  void initState() {
+    super.initState();
+    _loadLocations();
+  }
+
+  Future<void> _loadLocations() async {
+    List<Location> locations = await widget.locationService.getLocations();
+    setState(() {
+      _filteredLocations = locations;
+    });
+  }
+
+
+  void _filterLocations(String query) async{
+    final locations = await widget.locationService.getLocations();
     setState(() {
       _filteredLocations = query.isNotEmpty
-          ? fakeLocations
+          ? locations
               .where(
                   (loc) => loc.name.toLowerCase().contains(query.toLowerCase()))
               .toList()
-          : fakeLocations;
+          : locations;
     });
   }
 
