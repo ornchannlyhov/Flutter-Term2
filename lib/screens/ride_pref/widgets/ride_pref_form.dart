@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:week_3_blabla_project/dummy_data/dummy_data.dart';
 import 'package:week_3_blabla_project/screens/ride/ride_screen.dart';
 import '../../../model/ride/locations.dart';
 import '../../../model/ride_pref/ride_pref.dart';
-import 'package:week_3_blabla_project/screens/app_widget/blabla_button.dart';
-import 'package:week_3_blabla_project/screens/app_widget/location_picker.dart';
-import 'package:week_3_blabla_project/screens/app_widget/date_picker.dart';
-import 'package:week_3_blabla_project/screens/app_widget/seat_number_spinner.dart';
+import 'package:week_3_blabla_project/app_widgets/blabla_button.dart';
+import 'package:week_3_blabla_project/app_widgets/location_picker.dart';
+import 'package:week_3_blabla_project/app_widgets/date_picker.dart';
+import 'package:week_3_blabla_project/app_widgets/seat_number_spinner.dart';
 import 'package:week_3_blabla_project/theme/theme.dart';
+import 'package:week_3_blabla_project/service/rides_service.dart';
+import 'package:week_3_blabla_project/model/ride/ride.dart';
 
 class RidePrefForm extends StatefulWidget {
   final RidePref? initRidePref;
@@ -73,13 +74,21 @@ class _RidePrefFormState extends State<RidePrefForm> {
         departureDate: departureDate,
         requestedSeats: requestedSeats,
       );
+        // Filter rides based on RidePref using RidesService.getRidesFor
+    List<Ride> filteredRides = RidesService.getRidesFor(ridePref).where((ride) {
+      bool sameDay = ride.departureDate.year == ridePref.departureDate.year &&
+          ride.departureDate.month == ridePref.departureDate.month &&
+          ride.departureDate.day == ridePref.departureDate.day;
+
+      return ride.availableSeats >= ridePref.requestedSeats && sameDay;
+    }).toList();
 
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => RidesScreen(
             ridePref: ridePref,
-            rides: fakeRides,
+            rides: filteredRides,
           ),
         ),
       );
@@ -93,41 +102,38 @@ class _RidePrefFormState extends State<RidePrefForm> {
         Container(
           padding: const EdgeInsets.all(BlaSpacings.m),
           margin: const EdgeInsets.symmetric(horizontal: BlaSpacings.m),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(BlaSpacings.radius),
+          ),
           child: Column(
             children: [
-              // Departure Location Picker with Swap Button
               Stack(
+                alignment: Alignment.centerRight,
                 children: [
                   LocationPicker(
                     label: "Departure",
                     initialLocation: departure,
                     onLocationSelected: _updateDeparture,
                   ),
-                  Positioned(
-                    right: 10,
-                    top: 10,
-                    child: IconButton(
-                      icon: Icon(Icons.swap_vert, color: BlaColors.primary),
-                      onPressed: _switchLocations,
-                    ),
+                  IconButton(
+                    icon: Icon(Icons.swap_vert, color: BlaColors.primary),
+                    onPressed: _switchLocations,
                   ),
                 ],
               ),
               Divider(color: BlaColors.greyLight, thickness: 1),
-              // Arrival Location Picker
               LocationPicker(
                 label: "Arrival",
                 initialLocation: arrival,
                 onLocationSelected: _updateArrival,
               ),
               Divider(color: BlaColors.greyLight, thickness: 1),
-              // Date Picker
               DatePicker(
                 initialDate: departureDate,
                 onDateSelected: _updateDepartureDate,
               ),
               Divider(color: BlaColors.greyLight, thickness: 1),
-              // Seat Picker
               SeatNumberSpinner(
                 initialValue: requestedSeats,
                 onChanged: _updateSeats,
@@ -135,8 +141,6 @@ class _RidePrefFormState extends State<RidePrefForm> {
             ],
           ),
         ),
-
-        // Search Button
         SizedBox(
           width: double.infinity,
           child: Padding(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:week_3_blabla_project/screens/app_widget/blabla_button.dart';
-import '../../../theme/theme.dart';
+import 'package:week_3_blabla_project/app_widgets/blabla_button.dart';
+import '../../theme/theme.dart';
 import 'package:week_3_blabla_project/utils/animations_util.dart';
 
 class SeatNumberSpinner extends StatefulWidget {

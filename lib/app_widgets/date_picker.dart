@@ -18,9 +18,7 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  DateTime selectedDate;
-
-  _DatePickerState() : selectedDate = DateTime.now();
+  late DateTime selectedDate;
 
   @override
   void initState() {
@@ -34,9 +32,6 @@ class _DatePickerState extends State<DatePicker> {
       AnimationUtils.createBottomToTopRoute(
         DateSelectionScreen(
           initialDate: selectedDate,
-          onDateSelected: (date) {
-            Navigator.pop(context, date);
-          },
         ),
       ),
     );
@@ -76,12 +71,10 @@ class _DatePickerState extends State<DatePicker> {
 
 class DateSelectionScreen extends StatefulWidget {
   final DateTime initialDate;
-  final void Function(DateTime) onDateSelected;
 
   const DateSelectionScreen({
     super.key,
     required this.initialDate,
-    required this.onDateSelected,
   });
 
   @override
@@ -115,13 +108,9 @@ class _DateSelectionScreenState extends State<DateSelectionScreen> {
       body: CalendarDatePicker(
         initialDate: selectedDate,
         firstDate: DateTime.now(),
-        lastDate: DateTime.now().add(Duration(days: 365)),
+        lastDate: DateTime.now().add(const Duration(days: 365)),
         onDateChanged: (date) {
-          setState(() {
-            selectedDate = date;
-          });
-          widget.onDateSelected(date);
-          Navigator.pop(context);
+          Navigator.pop(context, date);
         },
       ),
     );

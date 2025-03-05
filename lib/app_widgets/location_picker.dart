@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:week_3_blabla_project/dummy_data/dummy_data.dart';
 import 'package:week_3_blabla_project/theme/theme.dart';
 import 'package:week_3_blabla_project/utils/animations_util.dart';
-import '../../../model/ride/locations.dart';
+import '../../model/ride/locations.dart';
 
 class LocationPicker extends StatefulWidget {
   final String label;

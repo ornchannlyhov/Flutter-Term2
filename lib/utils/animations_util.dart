@@ -8,8 +8,8 @@ class AnimationUtils {
   /// Slide given screen from bottom to top
   ///
   static Route<T> createBottomToTopRoute<T>(Widget screen) {
-    const begin = Offset(0.0, 1.0); // Start from the bottom of the screen
-    const end = Offset(0.0, 0.0);   // Move to the top of the screen
+    const begin = Offset(0.0, 1.0); 
+    const end = Offset(0.0, 0.0);
     return _createAnimatedRoute(screen, begin, end);
   }
 
